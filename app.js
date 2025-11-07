@@ -1,4 +1,5 @@
-import express from "express";
+import express from "express"
+import { usersRouter } from "./routes/users.js";
 const app = express();
 
 // Middleware para parsear JSON
@@ -10,6 +11,8 @@ app.get('/', (req, res) => {
 });
 
 const PORT = process.env.PORT || 1234;
+
+app.use("/", usersRouter);
 
 app.listen(PORT, () => {
     console.log("Server running on port 1234");

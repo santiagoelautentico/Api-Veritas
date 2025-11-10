@@ -132,7 +132,7 @@ export class UserModel {
             // Primer insert - usuario
             await connection.query(
                 'INSERT INTO users (name_user, lastname, username, email, password_user, id_country, role) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                [name_user, lastname, username, email, hashedPassword, id_country, 'creator']
+                [name_user, lastname, username, email, hashedPassword, id_country, 'regular']
             );
             // Segundo insert - datos del content creator
             await connection.query(
@@ -150,7 +150,7 @@ export class UserModel {
                 company, 
                 type_of_journalist, 
                 identification, 
-                role: 'creator' 
+                role: 'regular' 
             };
         } catch (error) {
             await connection.rollback();

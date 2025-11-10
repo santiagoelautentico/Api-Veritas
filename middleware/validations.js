@@ -27,17 +27,22 @@ export function validateUserRegistration(req, res, next) {
     next();
 }
 
-export function validateLoginRegular(req, res, next) {
-    const { email, password } = req.query;
+export function validateLogin(req, res, next) {
+    const { email, password } = req.body;
     const errors = [];
-    if (!email) errors.push("Email is required");
-     if (email && !email.includes("@")) {
+    
+    if (!email || email.trim() === "") {
+        errors.push("Email is required");
+    } else if (!email.includes("@")) {
         errors.push("Invalid email format");
-    };
-    if (password && password.length < 8) {
+    }
+
+    if (!password || password.trim() === "") {
+        errors.push("Password is required");
+    } else if (password.length < 8) {
         errors.push("Password must be at least 8 characters long");
     }
-    if (!password) errors.push("Password is required");
+
     if (errors.length > 0) {
         return res.status(400).json({ 
             status: "error",

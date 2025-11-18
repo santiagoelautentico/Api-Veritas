@@ -28,7 +28,7 @@ usersRouter.post("/loginUser", validateLogin, async (req, res) => {
         const user = await UserModel.loginUser(email, password);
         if (user.success) {
             const token = generateAuthToken(res, user.user);
-            res.send({user, token});
+            res.json({user, token});
         } else {
             res.status(401).json({ message: "Invalid credentials" });
         }

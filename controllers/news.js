@@ -18,4 +18,14 @@ export class NewsController {
             res.status(500).json({ message: "Server error", error: error.message });
         }
     }
+
+    static async getDetailNews(req, res) {
+        const { id_news } = req.params;
+        try {
+            const newList = await newsModel.getDetailNews(id_news);
+            res.status(200).json({ news: newList });
+        } catch (error) {
+            res.status(500).json({ message: "Server error", error: error.message })
+        }
+    }
 }

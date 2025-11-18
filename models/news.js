@@ -28,4 +28,15 @@ export class newsModel {
             };
         }
     }
+
+    static async getDetailNews(id_news) {
+        try {
+            const [rows] = await pool.query(
+            `SELECT * FROM news WHERE id_news = ${id_news};`
+            );
+            return rows;
+        } catch (error) {
+            return { error: error.message };
+        }
+    }
 }

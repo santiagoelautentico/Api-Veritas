@@ -2,6 +2,7 @@ import { Router } from "express";
 import { newsModel } from "../models/news.js";
 import jwt from 'jsonwebtoken';
 import { SECRET_JWT_KEY } from "../config.js";
+import { authMiddleware } from "../middleware/validations.js";
 //-----------------------------------------------------------------------------------------------------
 export const newsRouter = Router();
 
@@ -22,7 +23,7 @@ newsRouter.post("/createNew", async (req, res) => {
         res.status(500).json({ message: "Server error", error: error.message });
     }       
 });
-newsRouter.get("/",  async (req, res) => {
+newsRouter.get("/", authMiddleware, async (req, res) => {
     const token = req.cookies.access_token;
     if (!token) {
         return res.status(403).send('Access not authotized.');
@@ -30,7 +31,27 @@ newsRouter.get("/",  async (req, res) => {
     try {
         const newsList = await newsModel.getAllNews();
         res.status(200).json({ news: newsList });
+        console.log(process.env.SECRET_JWT_KEY);
+        
     } catch (error) {
         res.status(500).json({ message: "Server error", error: error.message });
+        console.log(token);
+        
     }
 });
+newsRouter.get("/:id_news", authMiddleware, async (req, res) => {
+  const { id_news } = req.params;
+  const token = req.cookies.access_token;
+
+  if (!token) {
+    return res.status(403).send("Access not authorized.");
+  }
+
+  try {
+    const newsList = await newsModel.getDetailNews(id_news);
+    res.status(200).json({ news: newsList });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+

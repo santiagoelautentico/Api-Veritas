@@ -73,9 +73,9 @@ usersRouter.post("/registerAdminUser", validateUserRegistration ,async (req, res
    
 });
 usersRouter.post("/registerContentCreator", validateUserRegistration ,async (req, res) => {
-    const { name_user, lastname, username, email, password, id_country, ocupation, company, type_of_journalist, identification } = req.body;
+    const { name_user, lastname, username, email, password, id_country, ocupation, company, type_of_journalist, identification, biography } = req.body;
     try {
-        const newCreator = await UserModel.registerContentCreator(name_user, lastname, username, email, password, id_country, ocupation, company, type_of_journalist, identification);
+        const newCreator = await UserModel.registerContentCreator(name_user, lastname, username, email, password, id_country, ocupation, company, type_of_journalist, identification, biography);
         res.status(201).json({ message: "Content creator registered successfully", user: newCreator });
     } catch (error) {
         res.status(500).json({ message: "Server error", error: error.message });

@@ -122,9 +122,8 @@ export class UserModel {
         );
          return { name_user, lastname, username, email, id_country, role: 'admin' };
     }
-
 // Add content creator user
-    static async registerContentCreator(name_user, lastname, username, email, password, id_country, ocupation, company, type_of_journalist, identification) {
+    static async registerContentCreator(name_user, lastname, username, email, password, id_country, ocupation, company, type_of_journalist, identification, biography) {
         const hashedPassword = await bcrypt.hash(password, 10);
         const connection = await pool.getConnection();
         try {
@@ -132,12 +131,12 @@ export class UserModel {
             // Primer insert - usuario
             await connection.query(
                 'INSERT INTO users (name_user, lastname, username, email, password_user, id_country, role) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                [name_user, lastname, username, email, hashedPassword, id_country, 'regular']
+                [name_user, lastname, username, email, hashedPassword, id_country, 'creator']
             );
             // Segundo insert - datos del content creator
             await connection.query(
-                'INSERT INTO content_creator_data (id_user, ocupation, company, type_of_journalist, identification, status_account) VALUES (LAST_INSERT_ID(), ?, ?, ?, ?, ?)',
-                [ocupation, company, type_of_journalist, identification, '0']
+                'INSERT INTO content_creator_data (id_user, ocupation, company, type_of_journalist, identification, status_account, biography) VALUES (LAST_INSERT_ID(), ?, ?, ?, ?, ?, ?)',
+                [ocupation, company, type_of_journalist, identification, '0', biography]
             );
             await connection.commit();
             return { 
@@ -150,6 +149,7 @@ export class UserModel {
                 company, 
                 type_of_journalist, 
                 identification, 
+                biography,
                 role: 'regular' 
             };
         } catch (error) {
@@ -164,7 +164,6 @@ export class UserModel {
         const [users] = await pool.query('SELECT * FROM users');
         return users;
     }
-
 }
 
 

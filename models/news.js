@@ -39,4 +39,15 @@ export class newsModel {
             return { error: error.message };
         }
     }
+    // Users news in profile
+    static async getUserNews(id_user) {
+        try {
+            const [rows] = await pool.query(
+                `SELECT * FROM news WHERE id_user = ${id_user};`
+            );
+            return rows
+        } catch(error) {
+            return { error: error.message}
+        }
+    }
 }

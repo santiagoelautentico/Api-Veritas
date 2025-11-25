@@ -54,4 +54,19 @@ newsRouter.get("/:id_news", authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
+newsRouter.get("/profileNews/:id_user", authMiddleware, async (req, res) => {
+  const { id_user } = req.params;
+  const token = req.cookies.access_token;
+
+  if (!token) {
+    return res.status(403).send("Access not authorized.");
+  }
+
+  try {
+    const newsList = await newsModel.getUserNews(id_user);
+    res.status(200).json({ news: newsList });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
 

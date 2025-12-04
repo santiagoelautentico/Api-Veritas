@@ -1,13 +1,16 @@
 import { Router } from "express";
 import { newsModel } from "../models/news.js";
 import jwt from 'jsonwebtoken';
-import { SECRET_JWT_KEY } from "../config.js";
+import { SECRET_JWT_KEY } from "../config/config.js";
 import { authMiddleware } from "../middleware/validations.js";
+import { NewsController } from "../controllers/news.js";
+import multer from "multer";
 //-----------------------------------------------------------------------------------------------------
 export const newsRouter = Router();
 
-newsRouter.post("/createNew", async (req, res) => {
-    const { title, subtitle, body, id_country, id_category ,id_user, sources } = req.body;
+const upload = multer({ dest: "uploads/" });
+
+newsRouter.post("/createNew", upload.single('image'), async (req, res) => {
     const token = req.cookies.access_token;
     if (!token) {
         return res.status(403).send('Access not authorized.');
@@ -15,11 +18,12 @@ newsRouter.post("/createNew", async (req, res) => {
     try {
         const data = jwt.verify(token, SECRET_JWT_KEY);
         if (data.role !== 'creator' && data.role !== 'admin') {
+            console.log('❌ Rol no autorizado'); 
             return res.status(403).json({ message: "Access denied", data });
         }
-        const newNews = await newsModel.createNews(title, subtitle, body, id_country, id_category ,id_user, sources);
-        res.status(201).json({ message: "News created successfully", news: newNews });
+        await NewsController.createNews(req, res);
     } catch (error) {
+        console.log('❌ Error en route:', error.message); 
         res.status(500).json({ message: "Server error", error: error.message });
     }       
 });

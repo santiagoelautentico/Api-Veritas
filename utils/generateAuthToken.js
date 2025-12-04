@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { SECRET_JWT_KEY } from '../config.js';
+import { SECRET_JWT_KEY } from '../config/config.js';
 export function generateAuthToken(res, user) {
 const token = jwt.sign(
   { id: user.id_user, role: user.role },

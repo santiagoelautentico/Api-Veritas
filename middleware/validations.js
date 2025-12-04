@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { SECRET_JWT_KEY } from "../config.js";
+import { SECRET_JWT_KEY } from "../config/config.js";
 export function validateUserRegistration(req, res, next) {
     const { name_user, lastname, username, email, password, id_country } = req.body;
     const errors = [];

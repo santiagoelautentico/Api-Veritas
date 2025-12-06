@@ -1,14 +1,17 @@
 import { Router } from "express";
 import { UserModel } from "../models/users.js";
+import { UserController } from "../controllers/users.js";
 import { generateAuthToken } from "../utils/generateAuthToken.js";
 import jwt from "jsonwebtoken";
 import { SECRET_JWT_KEY } from "../config/config.js";
+import multer from "multer";
 import {
   validateUserRegistration,
   validateLogin,
 } from "../middleware/validations.js";
 //-----------------------------------------------------------------------------------------------------
 export const usersRouter = Router();
+const upload = multer({ dest: "uploads/" });
 //-----------------------------------------------------------------------------------------------------
 // Login routes
 usersRouter.post("/adminLogin", validateLogin, async (req, res) => {
@@ -58,26 +61,32 @@ usersRouter.post("/loginUserCreator", validateLogin, async (req, res) => {
   }
 });
 //-----------------------------------------------------------------------------------------------------
-// Registration routes
 usersRouter.post(
-  "/registerRegularUser",
+  "/registerContentCreator", 
+  upload.single("image"),
   validateUserRegistration,
   async (req, res) => {
-    const { name_user, lastname, username, email, password, id_country } =
-      req.body;
     try {
-      const newUser = await UserModel.registerRegularUser(
-        name_user,
-        lastname,
-        username,
-        email,
-        password,
-        id_country
-      );
-      res
-        .status(201)
-        .json({ message: "User registered successfully", user: newUser });
+      console.log("Route: req.file:", !!req.file);
+      console.log("Route: req.body keys:", Object.keys(req.body));
+      await UserController.registerContentCreator(req, res);
     } catch (error) {
+      console.log("❌ Error en route:", error.message);
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  }
+);
+usersRouter.post(
+  "/registerRegularUser", 
+  upload.single("image"),
+  validateUserRegistration,
+  async (req, res) => {
+    try {
+      console.log("Route: req.file:", !!req.file);
+      console.log("Route: req.body keys:", Object.keys(req.body));
+      await UserController.registerRegularUser(req, res);
+    } catch (error) {
+      console.log("❌ Error en route:", error.message);
       res.status(500).json({ message: "Server error", error: error.message });
     }
   }
@@ -113,59 +122,16 @@ usersRouter.post(
         identification,
         biography
       );
-      res
-        .status(201)
-        .json({
-          message: "Admin registered successfully",
-          user: newAdmin,
-        });
+      res.status(201).json({
+        message: "Admin registered successfully",
+        user: newAdmin,
+      });
     } catch (error) {
       res.status(500).json({ message: "Server error", error: error.message });
     }
   }
 );
-usersRouter.post(
-  "/registerContentCreator",
-  validateUserRegistration,
-  async (req, res) => {
-    const {
-      name_user,
-      lastname,
-      username,
-      email,
-      password,
-      id_country,
-      ocupation,
-      company,
-      type_of_journalist,
-      identification,
-      biography,
-    } = req.body;
-    try {
-      const newCreator = await UserModel.registerContentCreator(
-        name_user,
-        lastname,
-        username,
-        email,
-        password,
-        id_country,
-        ocupation,
-        company,
-        type_of_journalist,
-        identification,
-        biography
-      );
-      res
-        .status(201)
-        .json({
-          message: "Content creator registered successfully",
-          user: newCreator,
-        });
-    } catch (error) {
-      res.status(500).json({ message: "Server error", error: error.message });
-    }
-  }
-);
+
 //-----------------------------------------------------------------------------------------------------
 // Get all users (admin only)
 usersRouter.get("/users", async (req, res) => {

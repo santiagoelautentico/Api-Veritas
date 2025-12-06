@@ -22,6 +22,10 @@ app.get('/', (req, res) => {
 });
 const PORT = process.env.PORT || 1234;
 
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
 app.use("/", usersRouter);
 app.use("/news", newsRouter);
 app.use('/categories', categoriesRouter);

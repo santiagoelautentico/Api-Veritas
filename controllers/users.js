@@ -1,4 +1,5 @@
 import { UserModel } from "../models/users.js";
+import { cloudinary } from "../config/cloudinary.js";
 export class UserController {
   // Method for admin login
   static async loginAdmin(req, res) {
@@ -46,25 +47,68 @@ export class UserController {
   }
   // New method for user registration
   static async registerRegularUser(req, res) {
-    const { name_user, lastname, username, email, password, id_country } =
-      req.body;
+    if (!req.body) return res.status(400).json({ message: "No body received" });
+    console.log("📦 Body recibido:", req.body);
+    console.log("🖼️ Picture recibido:", req.body.picture ? "SÍ HAY" : "NO HAY");
+
+    const {
+      name_user,
+      lastname,
+      username,
+      email,
+      password,
+      id_country,
+      picture,
+    } = req.body;
     try {
+      let picture_url = null;
+
+      if (picture) {
+        try {
+          const uploadResult = await cloudinary.uploader.upload(picture, {
+            folder: "users",
+            resource_type: "auto",
+            transformation: [
+              { width: 500, height: 500, crop: "limit" },
+              { quality: "auto:good" },
+            ],
+          });
+          picture_url = uploadResult.secure_url;
+          console.log("✅ Imagen subida a Cloudinary:", picture_url);
+        } catch (uploadError) {
+          console.error("❌ Error subiendo a Cloudinary:", uploadError);
+          return res.status(500).json({
+            message: "Error uploading image",
+            error: uploadError.message,
+          });
+        }
+      }
       const newUser = await UserModel.registerRegularUser(
         name_user,
         lastname,
         username,
         email,
         password,
-        id_country
+        id_country,
+        picture_url
       );
-      res
+      return res
         .status(201)
-        .json({ message: "User registered successfully", user: newUser });
+        .json({ message: "User Created Perfect", user: newUser });
     } catch (error) {
-      res.status(500).json({ message: "Server error", error: error.message });
+      console.error("❌ Error general:", error);
+      return res
+        .status(500)
+        .json({ message: "Server error", error: error.message });
     }
   }
+
   static async registerContentCreator(req, res) {
+    if (!req.body) return res.status(400).json({ message: "No body received" });
+
+    console.log("📦 Body recibido:", req.body);
+    console.log("🖼️ Picture recibido:", req.body.picture ? "SÍ HAY" : "NO HAY");
+
     const {
       name_user,
       lastname,
@@ -77,9 +121,34 @@ export class UserController {
       type_of_journalist,
       identification,
       biography,
+      picture,
     } = req.body;
+
     try {
-      const newCreator = await UserModel.registerContentCreator(
+      let picture_url = null;
+
+      if (picture) {
+        try {
+          const uploadResult = await cloudinary.uploader.upload(picture, {
+            folder: "users",
+            resource_type: "auto",
+            transformation: [
+              { width: 918, height: 630, crop: "limit" },
+              { quality: "auto:good" },
+            ],
+          });
+          picture_url = uploadResult.secure_url;
+          console.log("✅ Imagen subida a Cloudinary:", picture_url);
+        } catch (uploadError) {
+          console.error("❌ Error subiendo a Cloudinary:", uploadError);
+          return res.status(500).json({
+            message: "Error uploading image",
+            error: uploadError.message,
+          });
+        }
+      }
+
+      const newUser = await UserModel.registerContentCreator(
         name_user,
         lastname,
         username,
@@ -90,18 +159,21 @@ export class UserController {
         company,
         type_of_journalist,
         identification,
-        biography
+        biography,
+        picture_url // <- pasar la URL, no el base64
       );
-      res
+
+      return res
         .status(201)
-        .json({
-          message: "Content creator registered successfully",
-          user: newCreator,
-        });
+        .json({ message: "User Created Perfect", user: newUser });
     } catch (error) {
-      res.status(500).json({ message: "Server error", error: error.message });
+      console.error("❌ Error general:", error);
+      return res
+        .status(500)
+        .json({ message: "Server error", error: error.message });
     }
   }
+
   static async registerAdminUser(req, res) {
     const {
       name_user,
@@ -130,12 +202,10 @@ export class UserController {
         identification,
         biography
       );
-      res
-        .status(201)
-        .json({
-          message: "Content creator registered successfully",
-          user: newAdmin,
-        });
+      res.status(201).json({
+        message: "Content creator registered successfully",
+        user: newAdmin,
+      });
     } catch (error) {
       res.status(500).json({ message: "Server error", error: error.message });
     }

@@ -1,6 +1,7 @@
 import { pool } from "../dbConection.js";
 import bcrypt from "bcrypt";
 
+
 export class UserModel {
   // Method to handle admin login
   static async loginAdmin(email, password) {
@@ -111,14 +112,15 @@ export class UserModel {
     username,
     email,
     password,
-    id_country
+    id_country,
+    picture_url
   ) {
     const hashedPassword = await bcrypt.hash(password, 10);
     await pool.query(
-      "INSERT INTO users (name_user, lastname, username, email, password_user, id_country) VALUES (?, ?, ?, ?, ?, ?)",
-      [name_user, lastname, username, email, hashedPassword, id_country]
+      "INSERT INTO users (name_user, lastname, username, email, password_user, id_country, picture) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      [name_user, lastname, username, email, hashedPassword, id_country, picture_url]
     );
-    return { name_user, lastname, username, email, id_country };
+    return { name_user, lastname, username, email, id_country, picture_url };
   }
   // Method to create an admin user
   static async createAdminUser(
@@ -187,14 +189,15 @@ export class UserModel {
     company,
     type_of_journalist,
     identification,
-    biography
+    biography,
+    picture_url
   ) {
     const hashedPassword = await bcrypt.hash(password, 10);
     const connection = await pool.getConnection();
     try {
       await connection.beginTransaction();
       await connection.query(
-        "INSERT INTO users (name_user, lastname, username, email, password_user, id_country, role) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO users (name_user, lastname, username, email, password_user, id_country, role, picture) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         [
           name_user,
           lastname,
@@ -203,6 +206,7 @@ export class UserModel {
           hashedPassword,
           id_country,
           "creator",
+          picture_url
         ]
       );
       await connection.query(
@@ -222,6 +226,7 @@ export class UserModel {
         identification,
         biography,
         role: "regular",
+        picture_url
       };
     } catch (error) {
       await connection.rollback();

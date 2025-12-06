@@ -90,7 +90,18 @@ export class newsModel {
   static async getUserNews(id_user) {
     try {
       const [rows] = await pool.query(
-        `SELECT * FROM news WHERE id_user = ${id_user};`
+        `SELECT
+        n.*,
+        u.username,
+        u.picture,
+        c.type_of_journalist,
+        co.name_country
+      FROM news AS n
+      JOIN users AS u ON n.id_user = u.id_user
+      JOIN content_creator_data AS c ON n.id_user = c.id_user
+      LEFT JOIN countries AS co ON n.id_country = co.id_country
+      WHERE n.id_user = ?;`,
+        [id_user]
       );
       return rows;
     } catch (error) {

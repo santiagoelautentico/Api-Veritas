@@ -1,13 +1,12 @@
 import mysql from 'mysql2/promise';
-
+import { DB_NAME, DB_HOST, DB_PORT, DB_USER, DB_PASSWORD } from './config/config.js';
 export const pool = mysql.createPool({
-    host: "localhost",
-    user: "root",
-    port: 3306,
-    password: "",
-    database: "veritas_db",
+    host: DB_HOST,
+    user: DB_USER,
+    port: DB_PORT,
+    password: DB_PASSWORD,
+    database: DB_NAME
 });
-
 // Try to connect to the database
 export async function testConnection() {
     try {
@@ -20,4 +19,3 @@ export async function testConnection() {
         return false;
     }
 }
-

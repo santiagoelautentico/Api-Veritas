@@ -7,6 +7,7 @@ import { categoriesRouter } from './routes/categories.js'
 import { countriesRouter } from './routes/countries.js'
 import cookieParser from "cookie-parser";
 import { corsMiddelware } from "./middleware/cors.js";
+import { PORT } from './config/config.js';
 //-----------------------------------------------------------------------------------------------------
 const app = express();
 
@@ -20,11 +21,8 @@ dotenv.config();
 app.get('/', (req, res) => {
     res.json({ message: 'Welcome to Api-Veritas!' });
 });
-const PORT = process.env.PORT || 1234;
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.listen(PORT);
 
 app.use("/", usersRouter);
 app.use("/news", newsRouter);

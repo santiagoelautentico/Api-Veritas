@@ -65,7 +65,30 @@ export class newsModel {
       };
     }
   }
-
+  static async getNewsByCategory(id_category) {
+    try {
+      const [newsRows] = await pool.query(
+        `SELECT
+            n.*,
+            u.username,
+            u.picture,
+            c.type_of_journalist
+            FROM news AS n
+            JOIN users AS u
+                ON n.id_user = u.id_user
+            JOIN content_creator_data AS c
+                ON n.id_user = c.id_user
+            WHERE n.id_category = ?
+            ORDER BY n.created_at DESC;`,
+        [id_category]
+      );
+      return newsRows;
+    } catch (error) {
+      return {
+        error: error.message,
+      };
+    }
+  }
   static async getDetailNews(id_news) {
     try {
       const [rows] = await pool.query(
@@ -79,7 +102,8 @@ export class newsModel {
                 ON n.id_user = u.id_user
             JOIN content_creator_data AS c
                 ON n.id_user = c.id_user
-            WHERE n.id_news = ${id_news};`
+            WHERE n.id_news = ?;`,
+        [id_news]
       );
       return rows;
     } catch (error) {

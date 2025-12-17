@@ -1,7 +1,6 @@
 import { pool } from "../dbConection.js";
 import bcrypt from "bcrypt";
 
-
 export class UserModel {
   // Method to handle admin login
   static async loginAdmin(email, password) {
@@ -118,7 +117,15 @@ export class UserModel {
     const hashedPassword = await bcrypt.hash(password, 10);
     await pool.query(
       "INSERT INTO users (name_user, lastname, username, email, password_user, id_country, picture) VALUES (?, ?, ?, ?, ?, ?, ?)",
-      [name_user, lastname, username, email, hashedPassword, id_country, picture_url]
+      [
+        name_user,
+        lastname,
+        username,
+        email,
+        hashedPassword,
+        id_country,
+        picture_url,
+      ]
     );
     return { name_user, lastname, username, email, id_country, picture_url };
   }
@@ -206,7 +213,7 @@ export class UserModel {
           hashedPassword,
           id_country,
           "creator",
-          picture_url
+          picture_url,
         ]
       );
       await connection.query(
@@ -226,7 +233,7 @@ export class UserModel {
         identification,
         biography,
         role: "regular",
-        picture_url
+        picture_url,
       };
     } catch (error) {
       await connection.rollback();
@@ -239,5 +246,37 @@ export class UserModel {
   static async getAllUsers() {
     const [users] = await pool.query("SELECT * FROM users");
     return users;
+  }
+  static async getUserById(id_user) {
+    const [users] = await pool.query(
+      ` SELECT users.*, content_creator_data.ocupation, content_creator_data.company, content_creator_data.type_of_journalist, content_creator_data.identification, content_creator_data.status_account, content_creator_data.biography FROM users LEFT JOIN content_creator_data ON users.id_user = content_creator_data.id_user WHERE users.id_user = ? `,
+      [id_user]
+    );
+    return users[0];
+  }
+  static async deleteUser(id_user) {
+    const connection = await pool.getConnection();
+
+    try {
+      await connection.beginTransaction();
+
+      await connection.query("DELETE FROM news WHERE id_user = ?", [id_user]);
+
+      await connection.query(
+        "DELETE FROM content_creator_data WHERE id_user = ?",
+        [id_user]
+      );
+
+      await connection.query("DELETE FROM users WHERE id_user = ?", [id_user]);
+
+      await connection.commit();
+
+      return { message: "User deleted successfully" };
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
   }
 }

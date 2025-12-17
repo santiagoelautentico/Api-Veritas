@@ -6,11 +6,11 @@ const token = jwt.sign(
   SECRET_JWT_KEY,
   { expiresIn: '2h' }
 );
-  res.cookie('access_token', token, {
+  res.cookie("access_token", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    maxAge: 2 * 60 * 60 * 1000 // 2 horas
+    secure: false, // true solo en producción con HTTPS
+    sameSite: "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
   return token;

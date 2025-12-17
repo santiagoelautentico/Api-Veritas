@@ -135,17 +135,46 @@ usersRouter.post(
 //-----------------------------------------------------------------------------------------------------
 // Get all users (admin only)
 usersRouter.get("/users", async (req, res) => {
-  const token = req.cookies.access_token;
+  // Lee el token del header Authorization
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(' ')[1]; // Extrae "TOKEN" de "Bearer TOKEN"
+  
   if (!token) {
     return res.status(401).json({ message: "No token provided" });
   }
+  
   try {
     const data = jwt.verify(token, SECRET_JWT_KEY);
-    const users = await UserModel.getAllUsers();
+    
     if (data.role !== "admin") {
       return res.status(403).json({ message: "Access denied", data });
     }
+    
+    const users = await UserModel.getAllUsers();
     res.send({ users });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+// Get user by ID
+usersRouter.get("/users/:id_user", async (req, res) => {
+  const { id_user } = req.params;
+  try {
+    const user = await UserModel.getUserById(id_user);
+    if (user) {
+      res.status(200).json({ user });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+usersRouter.delete("/users/:id_user", async (req, res) => {
+  const { id_user } = req.params;
+  try {
+    const result = await UserModel.deleteUser(id_user);
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }

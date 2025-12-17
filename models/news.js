@@ -132,4 +132,15 @@ export class newsModel {
       return { error: error.message };
     }
   }
+  static async deleteNews(id_news) {
+    try {
+      const [result] = await pool.query(
+        `DELETE FROM news WHERE id_news = ?`,
+        [id_news]
+      );
+      return { affectedRows: result.affectedRows };
+    } catch (error) {
+      return { error: error.message };
+    }
+  }
 }

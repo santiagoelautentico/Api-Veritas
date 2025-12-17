@@ -291,29 +291,57 @@ export class UserModel {
     try {
       await connection.beginTransaction();
 
-      // Preparar la query de users según si viene contraseña o no
-      let userQuery;
-      let userParams;
+      // Construir dinámicamente la query de users
+      let userFields = [];
+      let userValues = [];
+
+      if (username) {
+        userFields.push("username = ?");
+        userValues.push(username);
+      }
+
+      if (picture_url) {
+        userFields.push("picture = ?");
+        userValues.push(picture_url);
+      }
 
       if (password) {
         const hashedPassword = await bcrypt.hash(password, 10);
-        userQuery =
-          "UPDATE users SET username = ?, picture = ?, password_user = ? WHERE id_user = ?";
-        userParams = [username, picture_url, hashedPassword, id_user];
-      } else {
-        userQuery =
-          "UPDATE users SET username = ?, picture = ? WHERE id_user = ?";
-        userParams = [username, picture_url, id_user];
+        userFields.push("password_user = ?");
+        userValues.push(hashedPassword);
       }
 
-      // Actualizar tabla users
-      await connection.query(userQuery, userParams);
+      // Solo actualizar users si hay campos para actualizar
+      if (userFields.length > 0) {
+        userValues.push(id_user);
+        const userQuery = `UPDATE users SET ${userFields.join(
+          ", "
+        )} WHERE id_user = ?`;
+        await connection.query(userQuery, userValues);
+      }
 
-      // Actualizar tabla content_creator_data
-      await connection.query(
-        "UPDATE content_creator_data SET company = ?, type_of_journalist = ? WHERE id_user = ?",
-        [company, type_of_journalist, id_user]
-      );
+      // Construir dinámicamente la query de content_creator_data
+      let creatorFields = [];
+      let creatorValues = [];
+
+      if (company) {
+        creatorFields.push("company = ?");
+        creatorValues.push(company);
+      }
+
+      if (type_of_journalist) {
+        creatorFields.push("type_of_journalist = ?");
+        creatorValues.push(type_of_journalist);
+      }
+
+      // Solo actualizar content_creator_data si hay campos para actualizar
+      if (creatorFields.length > 0) {
+        creatorValues.push(id_user);
+        const creatorQuery = `UPDATE content_creator_data SET ${creatorFields.join(
+          ", "
+        )} WHERE id_user = ?`;
+        await connection.query(creatorQuery, creatorValues);
+      }
 
       await connection.commit();
 
@@ -324,6 +352,7 @@ export class UserModel {
         company,
         type_of_journalist,
         passwordUpdated: !!password,
+        pictureUpdated: !!picture_url,
       };
     } catch (error) {
       await connection.rollback();

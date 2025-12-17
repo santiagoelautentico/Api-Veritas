@@ -250,11 +250,6 @@ export class UserController {
     const { username, company, type_of_journalist, password, picture } =
       req.body;
     try {
-      if (!username || !company || !type_of_journalist) {
-        return res.status(400).json({
-          message: "Username, company y type_of_journalist son requeridos",
-        });
-      }
       if (!id_user || isNaN(id_user)) {
         return res.status(400).json({
           message: "ID de usuario inválido",

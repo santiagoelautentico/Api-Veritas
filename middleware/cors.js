@@ -19,5 +19,8 @@ export const corsMiddelware = ({ acceptedOrigins = ACCEPTED_ORIGINS } = {}) => {
         return callback(new Error("Not allowed by CORS"));
       }
     },
+    credentials: true, // ← AGREGAR ESTO
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
   });
 };

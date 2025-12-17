@@ -28,13 +28,14 @@ newsRouter.post("/createNew", upload.single("image"), async (req, res) => {
   }
 });
 newsRouter.get("/", authMiddleware, async (req, res) => {
-  const token = req.cookies.access_token;
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(" ")[1];
   if (!token) {
     return res.status(403).send("Access not authorized.");
   }
 
   try {
-    const { category } = req.query; 
+    const { category } = req.query;
     let newsList;
     if (category) {
       newsList = await newsModel.getNewsByCategory(category);
@@ -48,7 +49,8 @@ newsRouter.get("/", authMiddleware, async (req, res) => {
 });
 newsRouter.get("/:id_news", authMiddleware, async (req, res) => {
   const { id_news } = req.params;
-  const token = req.cookies.access_token;
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(" ")[1];
 
   if (!token) {
     return res.status(403).send("Access not authorized.");
@@ -72,6 +74,17 @@ newsRouter.get("/profileNews/:id_user", authMiddleware, async (req, res) => {
   try {
     const newsList = await newsModel.getUserNews(id_user);
     res.status(200).json({ news: newsList });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+newsRouter.delete("/:id_news", authMiddleware, async (req, res) => {
+  const token = req.cookies.access_token;
+  if (!token) {
+    return res.status(403).send("Access not authorized.");
+  }
+  try {
+    await NewsController.deleteNews(req, res);
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }

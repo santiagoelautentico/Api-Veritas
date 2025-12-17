@@ -89,4 +89,15 @@ export class NewsController {
       res.status(500).json({ message: "Server error", error: error.message });
     }
   }
+  static async deleteNews(req, res) {
+    const { id_news } = req.params;
+    try {
+      const deleteResult = await newsModel.deleteNews(id_news);
+      res
+        .status(200)
+        .json({ message: "News deleted successfully", result: deleteResult });
+    } catch (error) {
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  }
 }

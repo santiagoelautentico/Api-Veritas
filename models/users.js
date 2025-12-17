@@ -279,4 +279,57 @@ export class UserModel {
       connection.release();
     }
   }
+  static async updateContentCreator(
+    id_user,
+    username,
+    picture_url,
+    company,
+    type_of_journalist,
+    password = null
+  ) {
+    const connection = await pool.getConnection();
+    try {
+      await connection.beginTransaction();
+
+      // Preparar la query de users según si viene contraseña o no
+      let userQuery;
+      let userParams;
+
+      if (password) {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        userQuery =
+          "UPDATE users SET username = ?, picture = ?, password_user = ? WHERE id_user = ?";
+        userParams = [username, picture_url, hashedPassword, id_user];
+      } else {
+        userQuery =
+          "UPDATE users SET username = ?, picture = ? WHERE id_user = ?";
+        userParams = [username, picture_url, id_user];
+      }
+
+      // Actualizar tabla users
+      await connection.query(userQuery, userParams);
+
+      // Actualizar tabla content_creator_data
+      await connection.query(
+        "UPDATE content_creator_data SET company = ?, type_of_journalist = ? WHERE id_user = ?",
+        [company, type_of_journalist, id_user]
+      );
+
+      await connection.commit();
+
+      return {
+        id_user,
+        username,
+        picture_url,
+        company,
+        type_of_journalist,
+        passwordUpdated: !!password,
+      };
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
+  }
 }

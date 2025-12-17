@@ -62,7 +62,7 @@ usersRouter.post("/loginUserCreator", validateLogin, async (req, res) => {
 });
 //-----------------------------------------------------------------------------------------------------
 usersRouter.post(
-  "/registerContentCreator", 
+  "/registerContentCreator",
   upload.single("image"),
   validateUserRegistration,
   async (req, res) => {
@@ -77,7 +77,7 @@ usersRouter.post(
   }
 );
 usersRouter.post(
-  "/registerRegularUser", 
+  "/registerRegularUser",
   upload.single("image"),
   validateUserRegistration,
   async (req, res) => {
@@ -137,19 +137,19 @@ usersRouter.post(
 usersRouter.get("/users", async (req, res) => {
   // Lee el token del header Authorization
   const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.split(' ')[1]; // Extrae "TOKEN" de "Bearer TOKEN"
-  
+  const token = authHeader && authHeader.split(" ")[1]; // Extrae "TOKEN" de "Bearer TOKEN"
+
   if (!token) {
     return res.status(401).json({ message: "No token provided" });
   }
-  
+
   try {
     const data = jwt.verify(token, SECRET_JWT_KEY);
-    
+
     if (data.role !== "admin") {
       return res.status(403).json({ message: "Access denied", data });
     }
-    
+
     const users = await UserModel.getAllUsers();
     res.send({ users });
   } catch (error) {
@@ -179,3 +179,7 @@ usersRouter.delete("/users/:id_user", async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
+usersRouter.put(
+  "/users/content-creator/:id_user",
+  UserController.updateContentCreator
+);

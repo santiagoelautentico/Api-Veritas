@@ -79,10 +79,6 @@ newsRouter.get("/profileNews/:id_user", authMiddleware, async (req, res) => {
   }
 });
 newsRouter.delete("/:id_news", authMiddleware, async (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) {
-    return res.status(403).send("Access not authorized.");
-  }
   try {
     await NewsController.deleteNews(req, res);
   } catch (error) {

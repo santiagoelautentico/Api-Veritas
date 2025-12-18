@@ -5,6 +5,7 @@ const ACCEPTED_ORIGINS = [
   "http://localhost:8080",
   "http://localhost:1234",
   "http://localhost:5173",
+  "https://admin-veritas-web.onrender.com/"
 ];
 
 export const corsMiddelware = ({ acceptedOrigins = ACCEPTED_ORIGINS } = {}) => {

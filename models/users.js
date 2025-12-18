@@ -233,8 +233,9 @@ export class UserModel {
         type_of_journalist,
         identification,
         biography,
-        role: "regular",
+        role: "creator",
         picture_url,
+        status_account,
         request
       };
     } catch (error) {

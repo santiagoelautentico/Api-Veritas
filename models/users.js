@@ -235,7 +235,6 @@ export class UserModel {
         biography,
         role: "creator",
         picture_url,
-        status_account,
         request
       };
     } catch (error) {

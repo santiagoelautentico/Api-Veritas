@@ -251,7 +251,7 @@ export class UserModel {
   }
   static async getUserById(id_user) {
     const [users] = await pool.query(
-      ` SELECT users.*, content_creator_data.ocupation, content_creator_data.company, content_creator_data.type_of_journalist, content_creator_data.identification, content_creator_data.status_account, content_creator_data.biography FROM users LEFT JOIN content_creator_data ON users.id_user = content_creator_data.id_user WHERE users.id_user = ? `,
+      ` SELECT users.*, content_creator_data.ocupation, content_creator_data.company, content_creator_data.type_of_journalist, content_creator_data.identification, content_creator_data.status_account, content_creator_data.biography, content_creator_data.request FROM users LEFT JOIN content_creator_data ON users.id_user = content_creator_data.id_user WHERE users.id_user = ? `,
       [id_user]
     );
     return users[0];

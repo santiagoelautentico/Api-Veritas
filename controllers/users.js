@@ -102,7 +102,6 @@ export class UserController {
         .json({ message: "Server error", error: error.message });
     }
   }
-
   static async registerContentCreator(req, res) {
     if (!req.body) return res.status(400).json({ message: "No body received" });
 
@@ -175,7 +174,6 @@ export class UserController {
         .json({ message: "Server error", error: error.message });
     }
   }
-
   static async registerAdminUser(req, res) {
     const {
       name_user,

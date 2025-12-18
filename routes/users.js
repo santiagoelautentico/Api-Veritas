@@ -184,3 +184,4 @@ usersRouter.put(
   "/users/content-creator/:id_user",
   UserController.updateContentCreator
 );
+usersRouter.patch('/users/:id_user/activate', UserController.activateAccount);

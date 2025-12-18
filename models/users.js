@@ -219,7 +219,15 @@ export class UserModel {
       );
       await connection.query(
         "INSERT INTO content_creator_data (id_user, ocupation, company, type_of_journalist, identification, status_account, biography, request) VALUES (LAST_INSERT_ID(), ?, ?, ?, ?, ?, ?, ?)",
-        [ocupation, company, type_of_journalist, identification, "0", biography, request]
+        [
+          ocupation,
+          company,
+          type_of_journalist,
+          identification,
+          "0",
+          biography,
+          request,
+        ]
       );
       await connection.commit();
       return {
@@ -235,7 +243,7 @@ export class UserModel {
         biography,
         role: "creator",
         picture_url,
-        request
+        request,
       };
     } catch (error) {
       await connection.rollback();
@@ -361,6 +369,24 @@ export class UserModel {
       throw error;
     } finally {
       connection.release();
+    }
+  }
+  static async activateAccount(id_user) {
+    try {
+      await pool.query(
+        "UPDATE content_creator_data SET status_account = 1 WHERE id_user = ?",
+        [id_user]
+      );
+
+      return {
+        success: true,
+        message: "Account activated successfully",
+        id_user,
+        status_account: 1,
+      };
+    } catch (error) {
+      console.error("Error activating account:", error);
+      throw error;
     }
   }
 }

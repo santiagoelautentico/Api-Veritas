@@ -121,7 +121,7 @@ export class UserController {
       identification,
       biography,
       picture,
-      request
+      request,
     } = req.body;
 
     try {
@@ -302,6 +302,21 @@ export class UserController {
       }
       return res.status(500).json({
         message: "Error al actualizar el content creator",
+        error: error.message,
+      });
+    }
+  }
+  static async activateAccount(req, res) {
+    const { id_user } = req.params;
+
+    try {
+      const result = await UserModel.activateAccount(id_user);
+      return res.status(200).json(result);
+    } catch (error) {
+      console.error("Error activating account:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Error activating account",
         error: error.message,
       });
     }

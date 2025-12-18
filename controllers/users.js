@@ -122,6 +122,7 @@ export class UserController {
       identification,
       biography,
       picture,
+      request
     } = req.body;
 
     try {
@@ -160,7 +161,8 @@ export class UserController {
         type_of_journalist,
         identification,
         biography,
-        picture_url // <- pasar la URL, no el base64
+        picture_url,
+        request
       );
 
       return res

@@ -197,7 +197,8 @@ export class UserModel {
     type_of_journalist,
     identification,
     biography,
-    picture_url
+    picture_url,
+    request
   ) {
     const hashedPassword = await bcrypt.hash(password, 10);
     const connection = await pool.getConnection();
@@ -217,8 +218,8 @@ export class UserModel {
         ]
       );
       await connection.query(
-        "INSERT INTO content_creator_data (id_user, ocupation, company, type_of_journalist, identification, status_account, biography) VALUES (LAST_INSERT_ID(), ?, ?, ?, ?, ?, ?)",
-        [ocupation, company, type_of_journalist, identification, "0", biography]
+        "INSERT INTO content_creator_data (id_user, ocupation, company, type_of_journalist, identification, status_account, biography, request) VALUES (LAST_INSERT_ID(), ?, ?, ?, ?, ?, ?, ?)",
+        [ocupation, company, type_of_journalist, identification, "0", biography, request]
       );
       await connection.commit();
       return {
@@ -234,6 +235,7 @@ export class UserModel {
         biography,
         role: "regular",
         picture_url,
+        request
       };
     } catch (error) {
       await connection.rollback();

@@ -61,6 +61,7 @@ usersRouter.post("/loginUserCreator", validateLogin, async (req, res) => {
   }
 });
 //-----------------------------------------------------------------------------------------------------
+// Register Content Creator
 usersRouter.post(
   "/registerContentCreator",
   upload.single("image"),

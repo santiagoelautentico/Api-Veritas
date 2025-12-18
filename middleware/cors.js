@@ -20,7 +20,7 @@ export const corsMiddelware = ({ acceptedOrigins = ACCEPTED_ORIGINS } = {}) => {
       }
     },
     credentials: true, // ← AGREGAR ESTO
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization']
   });
 };
